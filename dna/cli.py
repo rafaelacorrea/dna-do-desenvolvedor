@@ -12,7 +12,7 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Dict, List, Optional, Sequence
 
 from dna import tracos
 from dna.github import ClienteGitHub, ErroDeApi
@@ -33,6 +33,7 @@ Exemplos de uso:
 
 VARIAVEL_DE_TOKEN = "GITHUB_TOKEN"
 PASTA_PADRAO = Path("web") / "dados"
+ARQUIVO_DE_INDICE = "index.json"
 LARGURA_DA_BARRA = 24
 
 
@@ -112,6 +113,55 @@ def gravar(dna: Dict[str, Any], caminho: Path) -> Path:
     return caminho
 
 
+def montar_indice(pasta: Path) -> List[Dict[str, Any]]:
+    """Le a pasta de dados e monta a lista dos DNAs ja gerados.
+
+    O indice e reconstruido do zero a cada execucao, varrendo os arquivos que
+    estao la. Assim ele se corrige sozinho quando um JSON e apagado na mao, e
+    nenhum estado precisa ser guardado em outro lugar.
+
+    Cada entrada leva so o necessario para a cena montar a versao reduzida da
+    helice no plano de fundo: os tracos, a semente e a cor dominante.
+    """
+    entradas: List[Dict[str, Any]] = []
+
+    for caminho in sorted(pasta.glob("*.json")):
+        if caminho.name == ARQUIVO_DE_INDICE:
+            continue
+        try:
+            dados = json.loads(caminho.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if not isinstance(dados, dict) or "tracos" not in dados:
+            continue
+
+        idiomas = dados.get("linguagens") or []
+        entradas.append(
+            {
+                "usuario": dados.get("usuario") or caminho.stem,
+                "nome": dados.get("nome") or dados.get("usuario") or caminho.stem,
+                "semente": dados.get("semente", 1),
+                "tracos": dados["tracos"],
+                "cor": idiomas[0]["cor"] if idiomas else "#8b949e",
+                "gerado_em": dados.get("gerado_em"),
+            }
+        )
+
+    entradas.sort(key=lambda entrada: entrada["gerado_em"] or "", reverse=True)
+    return entradas
+
+
+def gravar_indice(pasta: Path) -> Path:
+    """Regrava o indice da pasta de dados e devolve o caminho do arquivo."""
+    caminho = pasta / ARQUIVO_DE_INDICE
+    caminho.parent.mkdir(parents=True, exist_ok=True)
+    caminho.write_text(
+        json.dumps(montar_indice(pasta), ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return caminho
+
+
 def main(argv: Optional[Sequence[str]] = None) -> int:
     """Ponto de entrada da aplicacao. Devolve o codigo de saida do processo."""
     analisador = construir_analisador()
@@ -141,7 +191,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         print(f"Erro: nao foi possivel gravar '{destino}': {erro}", file=sys.stderr)
         return 1
 
+    try:
+        indice = gravar_indice(destino.parent)
+    except OSError as erro:
+        print(f"Erro: nao foi possivel gravar o indice: {erro}", file=sys.stderr)
+        return 1
+
+    total = len(montar_indice(destino.parent))
+    colecao = "1 perfil" if total == 1 else f"{total} perfis"
     print(f"\nArquivo gravado em {destino}")
-    print(f"Abra a cena com: python -m http.server --directory web 8000")
+    print(f"Indice atualizado em {indice} ({colecao} na colecao)")
+    print("Abra a cena com: python -m http.server --directory web 8000")
     print(f"e acesse: http://localhost:8000/?usuario={usuario}")
     return 0
