@@ -445,10 +445,14 @@ uma vez so.
 
 **Nao grava nada.** O disco de uma funcao sem estado e somente leitura, entao
 o servico roda com `gravar_resultado=False`: o resultado fica no cache em
-memoria, que dura enquanto a instancia estiver quente, e os perfis
-versionados em `public/dados` seguem sendo lidos normalmente. Na pratica, a
-galeria de fundo e a colecao commitada, e qualquer usuario digitado e
-calculado na hora.
+memoria, que dura enquanto a instancia estiver quente.
+
+**Nao le a colecao commitada.** A pasta `public` e a saida estatica, e a
+hospedagem a mantem fora do pacote da funcao - nenhuma configuracao muda isso.
+Entao todo pedido e coletado no GitHub, e a rota `/api/indice` responde 404 de
+proposito, para a cena cair no `dados/index.json` servido pela CDN. O
+resultado visivel e o mesmo, e vem de um lugar mais rapido do que a funcao
+seria.
 
 **O token vem do ambiente.** Em `Settings -> Environment Variables` da
 hospedagem, `GITHUB_TOKEN` com um token de leitura publica. Isso leva o limite

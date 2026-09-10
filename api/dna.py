@@ -5,11 +5,16 @@ espera: um `handler` de `BaseHTTPRequestHandler` por arquivo. Quem faz o
 trabalho continua sendo o `dna.api.responder`, entao nao existe uma segunda
 versao das regras aqui.
 
-Duas diferencas em relacao ao servidor local:
+Tres diferencas em relacao ao servidor local:
 
 - **Nao grava nada.** O disco da funcao e somente leitura, entao o resultado
   fica so no cache em memoria, que sobrevive enquanto a instancia estiver
-  quente. Os perfis versionados em `public/dados` continuam sendo lidos.
+  quente.
+- **Nao le a colecao commitada.** A pasta `public` e a saida estatica do
+  projeto, e a hospedagem a mantem fora do pacote da funcao. Na pratica todo
+  pedido e coletado no GitHub, e a rota do indice responde 404 para que a cena
+  caia no `dados/index.json` servido pela CDN - que e mais rapido do que a
+  funcao seria de qualquer forma.
 - **O token vem do ambiente.** `GITHUB_TOKEN` configurado na hospedagem leva o
   limite de 60 para 5000 requisicoes por hora, sem nunca aparecer na pagina.
 """
