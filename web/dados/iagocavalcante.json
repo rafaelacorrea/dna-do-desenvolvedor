@@ -1,0 +1,70 @@
+{
+  "usuario": "iagocavalcante",
+  "nome": "Iago Cavalcante",
+  "avatar": "https://avatars.githubusercontent.com/u/5131187?v=4",
+  "gerado_em": "2026-09-10T01:02:53+00:00",
+  "semente": 2082782863,
+  "tracos": {
+    "backend": 29,
+    "frontend": 71,
+    "open_source": 80,
+    "atividade": 100,
+    "consistencia": 1,
+    "experimental": 53
+  },
+  "rotulos": {
+    "backend": "Backend",
+    "frontend": "Frontend",
+    "open_source": "Open Source",
+    "atividade": "Atividade",
+    "consistencia": "Consistencia",
+    "experimental": "Experimental"
+  },
+  "linguagens": [
+    {
+      "nome": "JavaScript",
+      "percentual": 26.7,
+      "grupo": "frontend",
+      "cor": "#f1e05a"
+    },
+    {
+      "nome": "TypeScript",
+      "percentual": 15.9,
+      "grupo": "frontend",
+      "cor": "#337ccc"
+    },
+    {
+      "nome": "Elixir",
+      "percentual": 15.4,
+      "grupo": "backend",
+      "cor": "#8c5ea1"
+    },
+    {
+      "nome": "Vue",
+      "percentual": 12.0,
+      "grupo": "frontend",
+      "cor": "#43bc86"
+    },
+    {
+      "nome": "Java",
+      "percentual": 6.1,
+      "grupo": "backend",
+      "cor": "#df9120"
+    },
+    {
+      "nome": "HTML",
+      "percentual": 6.0,
+      "grupo": "frontend",
+      "cor": "#e34c26"
+    }
+  ],
+  "estatisticas": {
+    "repositorios_publicos": 210,
+    "repositorios_proprios": 151,
+    "forks": 59,
+    "estrelas_recebidas": 303,
+    "seguidores": 402,
+    "eventos_analisados": 100,
+    "dias_ativos": 13
+  }
+}

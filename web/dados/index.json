@@ -1,5 +1,20 @@
 [
   {
+    "usuario": "iagocavalcante",
+    "nome": "Iago Cavalcante",
+    "semente": 2082782863,
+    "tracos": {
+      "backend": 29,
+      "frontend": 71,
+      "open_source": 80,
+      "atividade": 100,
+      "consistencia": 1,
+      "experimental": 53
+    },
+    "cor": "#f1e05a",
+    "gerado_em": "2026-09-10T01:02:53+00:00"
+  },
+  {
     "usuario": "josevalim",
     "nome": "José Valim",
     "semente": 128820647,

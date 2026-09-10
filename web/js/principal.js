@@ -262,8 +262,12 @@ async function buscarDna(nome) {
 
   const arquivo = await fetch(`dados/${alvo}.json`, { cache: "no-store" });
   if (!arquivo.ok) {
+    // Sem API, esta e uma publicacao estatica: quem visita nao tem como
+    // coletar, entao a mensagem explica a situacao em vez de pedir um comando.
     throw new ErroDeColeta(
-      `Nenhum DNA gerado para "${nome}". Suba a API com: python servidor.py`,
+      `"${nome}" ainda nao esta na colecao. Esta versao mostra apenas os DNAs ` +
+        "ja gerados; rodando o projeto na sua maquina, qualquer usuario e " +
+        "coletado na hora.",
     );
   }
   return await arquivo.json();
