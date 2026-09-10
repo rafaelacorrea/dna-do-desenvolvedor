@@ -248,6 +248,12 @@ body {
   text-align: center;
 }
 
+.aviso[data-tipo="espera"] {
+  border-color: var(--borda);
+  background: var(--vidro);
+  color: var(--texto-fraco);
+}
+
 .aviso[hidden] {
   display: none;
 }

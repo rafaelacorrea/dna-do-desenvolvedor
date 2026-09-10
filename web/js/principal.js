@@ -2,8 +2,13 @@
  * Montagem da cena e ligacao com a interface.
  *
  * O fluxo e curto: carrega o indice dos DNAs ja gerados, monta o perfil em
- * foco a partir do JSON dele e espalha os demais em uma galeria ao fundo.
- * Clicar em uma das estruturas de tras traz aquele perfil para o centro.
+ * foco e espalha os demais em uma galeria ao fundo. Clicar em uma das
+ * estruturas de tras traz aquele perfil para o centro.
+ *
+ * De onde vem o DNA: primeiro da API em Python (`servidor.py`), que coleta no
+ * GitHub e calcula na hora qualquer usuario digitado. Se nao houver API neste
+ * endereco - o caso de uma publicacao estatica no GitHub Pages - a cena cai
+ * nos arquivos JSON da pasta `dados`, gerados antes pelo CLI.
  */
 
 import * as THREE from "three";
@@ -221,7 +226,51 @@ async function focar(miniatura) {
 }
 
 /**
- * Busca o JSON de um usuario na pasta `dados` e monta a cena.
+ * Falha que ja tem uma mensagem pronta para mostrar a quem esta usando.
+ */
+class ErroDeColeta extends Error {}
+
+/**
+ * Busca o DNA de um usuario.
+ *
+ * Tenta a API em Python primeiro; ela devolve o perfil na hora, coletando no
+ * GitHub quando ainda nao existe arquivo. O cabecalho `X-Dna-Api` diz se a
+ * resposta veio mesmo da API: sem ele, o endereco nao tem servidor e a cena
+ * usa o arquivo estatico.
+ *
+ * @param {string} nome
+ * @returns {Promise<object>}
+ */
+async function buscarDna(nome) {
+  const alvo = encodeURIComponent(nome.toLowerCase());
+
+  try {
+    const resposta = await fetch(`api/dna/${alvo}`, { cache: "no-store" });
+    if (resposta.headers.get("x-dna-api")) {
+      if (resposta.ok) {
+        return await resposta.json();
+      }
+      const corpo = await resposta.json().catch(() => ({}));
+      throw new ErroDeColeta(corpo.erro || "a API nao conseguiu montar este DNA");
+    }
+  } catch (erro) {
+    if (erro instanceof ErroDeColeta) {
+      throw erro;
+    }
+    // Falha de rede na rota da API significa que nao ha servidor aqui.
+  }
+
+  const arquivo = await fetch(`dados/${alvo}.json`, { cache: "no-store" });
+  if (!arquivo.ok) {
+    throw new ErroDeColeta(
+      `Nenhum DNA gerado para "${nome}". Suba a API com: python servidor.py`,
+    );
+  }
+  return await arquivo.json();
+}
+
+/**
+ * Busca o DNA de um usuario e monta a cena com ele.
  *
  * @param {string} usuario
  * @param {boolean} manterCamera
@@ -234,25 +283,24 @@ async function carregar(usuario, manterCamera = false) {
   }
 
   document.body.classList.add("carregando");
-  avisar("");
+  avisar(`Coletando ${nome} no GitHub...`, "espera");
 
   try {
-    const resposta = await fetch(`dados/${encodeURIComponent(nome)}.json`, {
-      cache: "no-store",
-    });
-    if (!resposta.ok) {
-      throw new Error("arquivo nao encontrado");
-    }
-    montar(await resposta.json(), manterCamera);
-    document.getElementById("usuario").value = nome;
+    const dna = await buscarDna(nome);
+    // O indice pode ter crescido: a API grava o perfil novo antes de responder.
+    await carregarIndice();
+    montar(dna, manterCamera);
 
+    document.getElementById("usuario").value = dna.usuario;
     const url = new URL(window.location.href);
-    url.searchParams.set("usuario", nome);
+    url.searchParams.set("usuario", dna.usuario);
     window.history.replaceState({}, "", url);
+
+    avisar("");
     return true;
   } catch (erro) {
     avisar(
-      `Nenhum DNA gerado para "${nome}". Rode no terminal: python dna_cli.py ${nome}`,
+      erro instanceof ErroDeColeta ? erro.message : `Nao foi possivel carregar "${nome}".`,
     );
     return false;
   } finally {
@@ -261,16 +309,22 @@ async function carregar(usuario, manterCamera = false) {
 }
 
 /**
- * Le a lista de DNAs ja gerados. A ausencia do indice nao e um erro: a cena
- * continua funcionando, so fica sem a galeria de fundo.
+ * Le a lista de DNAs ja gerados, da API ou do arquivo. A ausencia do indice
+ * nao e um erro: a cena continua funcionando, so fica sem galeria de fundo.
  */
 async function carregarIndice() {
-  try {
-    const resposta = await fetch("dados/index.json", { cache: "no-store" });
-    indice = resposta.ok ? await resposta.json() : [];
-  } catch (erro) {
-    indice = [];
+  for (const rota of ["api/indice", "dados/index.json"]) {
+    try {
+      const resposta = await fetch(rota, { cache: "no-store" });
+      if (resposta.ok) {
+        indice = await resposta.json();
+        return;
+      }
+    } catch (erro) {
+      // Rota indisponivel: tenta a proxima.
+    }
   }
+  indice = [];
 }
 
 document.getElementById("busca").addEventListener("submit", (evento) => {

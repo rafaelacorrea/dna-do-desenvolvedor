@@ -147,10 +147,14 @@ export function atualizarPainel(dna) {
 
 /**
  * Mostra ou esconde a faixa de aviso.
+ *
  * @param {string} mensagem Texto do aviso; vazio esconde a faixa.
+ * @param {"erro" | "espera"} tipo Muda a cor: vermelho para falha, neutro
+ *   para o aviso de que a coleta esta em andamento.
  */
-export function avisar(mensagem) {
+export function avisar(mensagem, tipo = "erro") {
   const aviso = document.getElementById("aviso");
   aviso.textContent = mensagem;
+  aviso.dataset.tipo = tipo;
   aviso.hidden = !mensagem;
 }
