@@ -55,5 +55,24 @@
     <div class="aviso" id="aviso" hidden></div>
 
     <script type="module" src="js/principal.js"></script>
+
+    <!--
+      Analytics do dominio principal. O script manual permite registrar a
+      visita como /dna dentro do site rafaelacorrea.dev, em vez de mais um "/"
+      misturado com a home - sem precisar criar um site separado no Plausible.
+    -->
+    <script
+      defer
+      data-domain="rafaelacorrea.dev"
+      src="https://plausible.io/js/script.manual.js"
+    ></script>
+    <script>
+      window.plausible =
+        window.plausible ||
+        function () {
+          (window.plausible.q = window.plausible.q || []).push(arguments);
+        };
+      plausible("pageview", { u: "https://rafaelacorrea.dev/dna" });
+    </script>
   </body>
 </html>
