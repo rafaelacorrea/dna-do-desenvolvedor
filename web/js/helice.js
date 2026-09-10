@@ -60,10 +60,14 @@ export function parametros(tracos) {
 
 /**
  * Calcula os pontos das duas fitas e dos pares de bases.
+ *
+ * Exportada porque a galeria do plano de fundo monta versoes reduzidas da
+ * helice a partir do mesmo esqueleto.
+ *
  * @param {object} config Resultado de `parametros`.
  * @param {() => number} aleatorio
  */
-function esqueleto(config, aleatorio) {
+export function esqueleto(config, aleatorio) {
   // O espacamento vertical nasce de incrementos sorteados: quanto menor a
   // consistencia, mais os degraus se afastam de um ritmo regular.
   const incrementos = [];
@@ -257,7 +261,14 @@ export function descartar(raiz) {
     }
     if (objeto.material) {
       const materiais = Array.isArray(objeto.material) ? objeto.material : [objeto.material];
-      materiais.forEach((material) => material.dispose());
+      materiais.forEach((material) => {
+        // Os rotulos sao texturas de canvas: sem descartar o mapa, cada troca
+        // de perfil deixaria uma textura orfa na memoria de video.
+        if (material.map) {
+          material.map.dispose();
+        }
+        material.dispose();
+      });
     }
   });
 }
