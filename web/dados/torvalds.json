@@ -1,0 +1,46 @@
+{
+  "usuario": "torvalds",
+  "nome": "Linus Torvalds",
+  "avatar": "https://avatars.githubusercontent.com/u/1024025?v=4",
+  "gerado_em": "2026-09-10T00:08:39+00:00",
+  "semente": 1828813506,
+  "tracos": {
+    "backend": 100,
+    "frontend": 0,
+    "open_source": 80,
+    "atividade": 80,
+    "consistencia": 82,
+    "experimental": 52
+  },
+  "rotulos": {
+    "backend": "Backend",
+    "frontend": "Frontend",
+    "open_source": "Open Source",
+    "atividade": "Atividade",
+    "consistencia": "Consistencia",
+    "experimental": "Experimental"
+  },
+  "linguagens": [
+    {
+      "nome": "C",
+      "percentual": 85.6,
+      "grupo": "backend",
+      "cor": "#808080"
+    },
+    {
+      "nome": "OpenSCAD",
+      "percentual": 14.4,
+      "grupo": "outros",
+      "cor": "#a769d3"
+    }
+  ],
+  "estatisticas": {
+    "repositorios_publicos": 12,
+    "repositorios_proprios": 9,
+    "forks": 3,
+    "estrelas_recebidas": 259492,
+    "seguidores": 321666,
+    "eventos_analisados": 100,
+    "dias_ativos": 28
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "usuario": "franknfjr",
+  "nome": "Frank Ferreira",
+  "avatar": "https://avatars.githubusercontent.com/u/28960217?v=4",
+  "gerado_em": "2026-09-10T00:08:41+00:00",
+  "semente": 4146515582,
+  "tracos": {
+    "backend": 66,
+    "frontend": 34,
+    "open_source": 40,
+    "atividade": 49,
+    "consistencia": 40,
+    "experimental": 56
+  },
+  "rotulos": {
+    "backend": "Backend",
+    "frontend": "Frontend",
+    "open_source": "Open Source",
+    "atividade": "Atividade",
+    "consistencia": "Consistencia",
+    "experimental": "Experimental"
+  },
+  "linguagens": [
+    {
+      "nome": "Elixir",
+      "percentual": 43.2,
+      "grupo": "backend",
+      "cor": "#8c5ea1"
+    },
+    {
+      "nome": "Swift",
+      "percentual": 17.4,
+      "grupo": "frontend",
+      "cor": "#f05138"
+    },
+    {
+      "nome": "Java",
+      "percentual": 14.8,
+      "grupo": "backend",
+      "cor": "#df9120"
+    },
+    {
+      "nome": "JavaScript",
+      "percentual": 5.2,
+      "grupo": "frontend",
+      "cor": "#f1e05a"
+    },
+    {
+      "nome": "HTML",
+      "percentual": 4.1,
+      "grupo": "frontend",
+      "cor": "#e34c26"
+    },
+    {
+      "nome": "TypeScript",
+      "percentual": 4.1,
+      "grupo": "frontend",
+      "cor": "#337ccc"
+    }
+  ],
+  "estatisticas": {
+    "repositorios_publicos": 76,
+    "repositorios_proprios": 54,
+    "forks": 22,
+    "estrelas_recebidas": 9,
+    "seguidores": 21,
+    "eventos_analisados": 8,
+    "dias_ativos": 3
+  }
+}

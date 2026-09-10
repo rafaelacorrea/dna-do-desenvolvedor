@@ -1,0 +1,70 @@
+{
+  "usuario": "rafaelacorrea",
+  "nome": "Rafaela Correa",
+  "avatar": "https://avatars.githubusercontent.com/u/35432817?v=4",
+  "gerado_em": "2026-09-10T00:08:36+00:00",
+  "semente": 2530147054,
+  "tracos": {
+    "backend": 42,
+    "frontend": 58,
+    "open_source": 39,
+    "atividade": 76,
+    "consistencia": 76,
+    "experimental": 64
+  },
+  "rotulos": {
+    "backend": "Backend",
+    "frontend": "Frontend",
+    "open_source": "Open Source",
+    "atividade": "Atividade",
+    "consistencia": "Consistencia",
+    "experimental": "Experimental"
+  },
+  "linguagens": [
+    {
+      "nome": "Elixir",
+      "percentual": 25.8,
+      "grupo": "backend",
+      "cor": "#8c5ea1"
+    },
+    {
+      "nome": "HTML",
+      "percentual": 17.5,
+      "grupo": "frontend",
+      "cor": "#e34c26"
+    },
+    {
+      "nome": "CSS",
+      "percentual": 15.5,
+      "grupo": "frontend",
+      "cor": "#7754ab"
+    },
+    {
+      "nome": "JavaScript",
+      "percentual": 14.0,
+      "grupo": "frontend",
+      "cor": "#f1e05a"
+    },
+    {
+      "nome": "Python",
+      "percentual": 11.6,
+      "grupo": "backend",
+      "cor": "#4b8bbe"
+    },
+    {
+      "nome": "TypeScript",
+      "percentual": 11.0,
+      "grupo": "frontend",
+      "cor": "#337ccc"
+    }
+  ],
+  "estatisticas": {
+    "repositorios_publicos": 56,
+    "repositorios_proprios": 40,
+    "forks": 16,
+    "estrelas_recebidas": 9,
+    "seguidores": 32,
+    "eventos_analisados": 34,
+    "dias_ativos": 3
+  }
+}
