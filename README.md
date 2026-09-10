@@ -331,6 +331,8 @@ mantem o algoritmo em um lugar so.
 
 ```
 dna-do-desenvolvedor/
+  .github/workflows/
+    pages.yml                Testa, atualiza os perfis e publica no Pages
   servidor.py                Executavel: sobe a cena e a API juntas
   dna_cli.py                 Executavel: chama dna.cli.main
   dna/
@@ -351,6 +353,7 @@ dna-do-desenvolvedor/
       aleatorio.js           Gerador pseudoaleatorio com semente
       painel.js              Painel de tracos, linguagens e estatisticas
     dados/                   JSONs gerados pelo CLI, mais o index.json
+    CNAME                    Dominio usado na publicacao
   testes/
     test_tracos.py           Testes do algoritmo
     test_linguagens.py       Testes da classificacao e das cores
@@ -402,22 +405,44 @@ mensagem em portugues.
 ## Publicando no GitHub Pages
 
 O Pages serve arquivos, nao roda Python. Publicado la, o site funciona com os
-perfis que ja estao commitados, e o campo de busca so encontra quem tem
+perfis que ja estao na pasta de dados, e o campo de busca so encontra quem tem
 arquivo - sem API, nao ha como coletar um usuario novo. A cena percebe isso
 sozinha e cai nos arquivos estaticos.
 
-Para ter a coleta ao vivo no ar, o `servidor.py` precisa estar rodando em algum
-lugar (uma maquina sua, um container, uma hospedagem que aceite Python).
+A publicacao vai pelo workflow `.github/workflows/pages.yml`, que a cada push
+na `main` (e uma vez por dia, as 6h UTC):
 
-A pasta `web` e um site estatico comum. Com o Pages ligado na raiz da branch
-`main`, a cena fica em:
+1. roda a suite de testes;
+2. regera cada perfil da colecao chamando o proprio CLI;
+3. sobe a pasta `web` como artefato e publica.
 
-```
-https://<usuario>.github.io/dna-do-desenvolvedor/web/?usuario=rafaelacorrea
-```
+E ali, e so ali, que existe token: o `GITHUB_TOKEN` automatico do Actions, que
+da 1000 requisicoes por hora na API do GitHub. Nenhum token e criado a mao nem
+fica no repositorio - um token em site estatico seria publico para qualquer
+visitante.
 
-Como o JSON e um arquivo do repositorio, qualquer perfil que voce quiser deixar
-disponivel precisa ser gerado e commitado antes:
+Para ligar: **Settings -> Pages -> Source: GitHub Actions**.
+
+### Dominio proprio
+
+O arquivo `web/CNAME` define o endereco final. Para um subdominio como
+`dna.seudominio.dev`, funcionando ao lado de um Pages que ja usa o dominio
+principal em outro repositorio:
+
+1. `Settings -> Pages -> Custom domain`: `dna.seudominio.dev`;
+2. no DNS, um registro `CNAME` de `dna` apontando para `<usuario>.github.io.`;
+3. marcar **Enforce HTTPS** depois que o certificado sair.
+
+Cada repositorio pode ter o seu proprio dominio: o repo do site principal fica
+com o apex e este fica com o subdominio, sem conflito.
+
+### Coleta ao vivo
+
+Para o campo de busca coletar usuarios novos, o `servidor.py` precisa estar
+rodando em algum lugar que aceite Python (uma maquina sua, um container, uma
+hospedagem com suporte a Python). O Pages sozinho nunca fara isso.
+
+### Acrescentando um perfil a mao
 
 ```bash
 python dna_cli.py alguem
