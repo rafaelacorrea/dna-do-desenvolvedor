@@ -1,0 +1,289 @@
+/* Estilo da interface sobreposta a cena 3D.
+   A pagina inteira e escura: o unico elemento realmente luminoso e a helice. */
+
+:root {
+  --fundo: #05070d;
+  --texto: #e6edf3;
+  --texto-fraco: #8b949e;
+  --borda: rgba(139, 148, 158, 0.22);
+  --vidro: rgba(13, 17, 23, 0.62);
+  --backend: #58a6ff;
+  --frontend: #f0883e;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--fundo);
+  color: var(--texto);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  overflow: hidden;
+}
+
+#cena {
+  position: fixed;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.cabecalho,
+.painel,
+.rodape {
+  position: fixed;
+  z-index: 2;
+}
+
+.cabecalho {
+  top: 0;
+  left: 0;
+  padding: 28px 32px;
+  pointer-events: none;
+}
+
+.sobrenome {
+  margin: 0;
+  font-size: 11px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--texto-fraco);
+}
+
+.cabecalho h1 {
+  margin: 6px 0 0;
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.dica {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--texto-fraco);
+}
+
+.painel {
+  top: 28px;
+  right: 32px;
+  width: 290px;
+  padding: 20px;
+  border: 1px solid var(--borda);
+  border-radius: 14px;
+  background: var(--vidro);
+  backdrop-filter: blur(14px);
+}
+
+.tracos {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 14px;
+}
+
+.traco-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 6px;
+}
+
+.traco-nome {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--texto-fraco);
+}
+
+.traco-valor {
+  font-variant-numeric: tabular-nums;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.traco-trilho {
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(139, 148, 158, 0.18);
+  overflow: hidden;
+}
+
+.traco-preenchimento {
+  height: 100%;
+  border-radius: 2px;
+  transform-origin: left center;
+  transition: transform 900ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.linguagens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--borda);
+}
+
+.linguagem {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  color: var(--texto-fraco);
+}
+
+.ponto {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex: none;
+}
+
+.estatisticas {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 12px;
+  margin: 18px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--borda);
+  font-size: 12px;
+  color: var(--texto-fraco);
+}
+
+.estatisticas dt {
+  margin: 0;
+}
+
+.estatisticas dd {
+  margin: 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--texto);
+}
+
+.rodape {
+  left: 32px;
+  bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.busca {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px 8px 14px;
+  border: 1px solid var(--borda);
+  border-radius: 999px;
+  background: var(--vidro);
+  backdrop-filter: blur(14px);
+}
+
+.busca label {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--texto-fraco);
+}
+
+.busca input {
+  width: 150px;
+  border: 0;
+  background: transparent;
+  color: var(--texto);
+  font: inherit;
+  outline: none;
+}
+
+.busca button {
+  border: 0;
+  border-radius: 999px;
+  padding: 6px 14px;
+  background: var(--texto);
+  color: var(--fundo);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.busca button:hover {
+  background: var(--backend);
+}
+
+.alternador {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--texto-fraco);
+  cursor: pointer;
+}
+
+.aviso {
+  position: fixed;
+  z-index: 3;
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%);
+  max-width: min(560px, calc(100vw - 48px));
+  padding: 12px 18px;
+  border: 1px solid rgba(255, 123, 114, 0.4);
+  border-radius: 10px;
+  background: rgba(45, 15, 16, 0.86);
+  color: #ffb4ad;
+  font-size: 13px;
+  text-align: center;
+}
+
+.aviso[hidden] {
+  display: none;
+}
+
+.carregando .cabecalho h1 {
+  opacity: 0.45;
+}
+
+@media (max-width: 860px) {
+  .cabecalho {
+    padding: 20px;
+  }
+
+  .cabecalho h1 {
+    font-size: 22px;
+  }
+
+  .painel {
+    top: auto;
+    right: 16px;
+    left: 16px;
+    bottom: 88px;
+    width: auto;
+    max-height: 42vh;
+    overflow-y: auto;
+  }
+
+  .rodape {
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    gap: 12px;
+  }
+
+  .aviso {
+    bottom: auto;
+    top: 96px;
+  }
+}

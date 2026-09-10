@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DNA do Desenvolvedor</title>
+    <meta
+      name="description"
+      content="O perfil publico de um usuario do GitHub transformado em uma helice 3D procedural."
+    />
+    <link rel="stylesheet" href="estilo.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <canvas id="cena"></canvas>
+
+    <header class="cabecalho">
+      <p class="sobrenome">DNA do desenvolvedor</p>
+      <h1 id="titulo">carregando</h1>
+      <p class="dica">arraste para girar &middot; role para aproximar</p>
+    </header>
+
+    <section class="painel" id="painel" aria-label="Tracos do perfil">
+      <ul class="tracos" id="tracos"></ul>
+      <div class="linguagens" id="linguagens"></div>
+      <dl class="estatisticas" id="estatisticas"></dl>
+    </section>
+
+    <footer class="rodape">
+      <form class="busca" id="busca">
+        <label for="usuario">usuario</label>
+        <input
+          id="usuario"
+          name="usuario"
+          type="text"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="rafaelacorrea"
+        />
+        <button type="submit">gerar</button>
+      </form>
+      <label class="alternador">
+        <input type="checkbox" id="mostrar-eixos" />
+        <span>mostrar eixos</span>
+      </label>
+    </footer>
+
+    <div class="aviso" id="aviso" hidden></div>
+
+    <script type="module" src="js/principal.js"></script>
+  </body>
+</html>
