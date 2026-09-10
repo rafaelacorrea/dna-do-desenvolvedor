@@ -13,7 +13,7 @@ import urllib.request
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from dna.api import ServicoDeDna, criar_servidor
+from dna.api import ServicoDeDna, criar_servidor, responder
 from dna.github import ErroDeApi, LimiteExcedido, UsuarioNaoEncontrado
 
 PERFIL = {"login": "rafaelacorrea", "name": "Rafaela Correa", "followers": 32, "public_repos": 2}
@@ -123,12 +123,23 @@ class TesteColeta(BaseDeApi):
         indice = json.loads((self.pasta_dados / "index.json").read_text(encoding="utf-8"))
         self.assertEqual([entrada["usuario"] for entrada in indice], ["rafaelacorrea"])
 
-    def test_segunda_chamada_usa_o_arquivo(self) -> None:
+    def test_segunda_chamada_nao_volta_ao_github(self) -> None:
         self.pegar("/api/dna/rafaelacorrea")
         _, cabecalhos, _ = self.pegar("/api/dna/rafaelacorrea")
 
-        self.assertEqual(cabecalhos.get("X-Dna-Origem"), "arquivo")
+        # A memoria responde antes do disco: o perfil acabou de ser coletado.
+        self.assertEqual(cabecalhos.get("X-Dna-Origem"), "memoria")
         self.assertEqual(self.cliente.chamadas, 1)
+
+    def test_processo_novo_encontra_o_arquivo(self) -> None:
+        self.pegar("/api/dna/rafaelacorrea")
+
+        # Um servico recem-criado nao tem memoria, mas o arquivo continua la.
+        outro = ServicoDeDna(self.pasta_dados, ClienteFalso())
+        dna, origem = outro.obter("rafaelacorrea")
+
+        self.assertEqual(origem, "arquivo")
+        self.assertEqual(dna["usuario"], "rafaelacorrea")
 
     def test_forcar_ignora_o_arquivo(self) -> None:
         self.pegar("/api/dna/rafaelacorrea")
@@ -165,11 +176,11 @@ class TesteGrafiaDoLogin(BaseDeApi):
         self.pegar("/api/dna/RAFAELACORREA")
         self.assertTrue((self.pasta_dados / "rafaelacorrea.json").exists())
 
-    def test_grafia_diferente_reaproveita_o_arquivo(self) -> None:
+    def test_grafia_diferente_reaproveita_o_resultado(self) -> None:
         self.pegar("/api/dna/RAFAELACORREA")
         _, cabecalhos, _ = self.pegar("/api/dna/rafaelacorrea")
 
-        self.assertEqual(cabecalhos.get("X-Dna-Origem"), "arquivo")
+        self.assertEqual(cabecalhos.get("X-Dna-Origem"), "memoria")
         self.assertEqual(self.cliente.chamadas, 1)
 
 
@@ -219,6 +230,83 @@ class TesteApiIndisponivel(BaseDeApi):
         situacao, _, corpo = self.pegar("/api/dna/rafaelacorrea")
         self.assertEqual(situacao, 502)
         self.assertIn("indisponivel", json.loads(corpo)["erro"])
+
+
+class TesteSomenteLeitura(unittest.TestCase):
+    """Modo usado na nuvem, onde o disco nao aceita escrita."""
+
+    def setUp(self) -> None:
+        self.diretorio = TemporaryDirectory()
+        self.pasta = Path(self.diretorio.name)
+        self.cliente = ClienteFalso()
+        self.servico = ServicoDeDna(self.pasta, self.cliente, gravar_resultado=False)
+
+    def tearDown(self) -> None:
+        self.diretorio.cleanup()
+
+    def test_nao_grava_nada_no_disco(self) -> None:
+        self.servico.obter("rafaelacorrea")
+        self.assertEqual(list(self.pasta.iterdir()), [])
+
+    def test_memoria_evita_a_segunda_coleta(self) -> None:
+        self.servico.obter("rafaelacorrea")
+        dna, origem = self.servico.obter("rafaelacorrea")
+
+        self.assertEqual(origem, "memoria")
+        self.assertEqual(dna["usuario"], "rafaelacorrea")
+        self.assertEqual(self.cliente.chamadas, 1)
+
+    def test_forcar_ignora_a_memoria(self) -> None:
+        self.servico.obter("rafaelacorrea")
+        _, origem = self.servico.obter("rafaelacorrea", forcar=True)
+
+        self.assertEqual(origem, "github")
+        self.assertEqual(self.cliente.chamadas, 2)
+
+    def test_memoria_descarta_os_mais_antigos(self) -> None:
+        servico = ServicoDeDna(
+            self.pasta, ClienteFalso(), gravar_resultado=False, memoria_maxima=2
+        )
+        for login in ("um", "dois", "tres"):
+            servico.cliente.login = login
+            servico.obter(login)
+
+        self.assertIsNone(servico.ler_da_memoria("um"))
+        self.assertIsNotNone(servico.ler_da_memoria("tres"))
+
+
+class TesteResponder(unittest.TestCase):
+    """A funcao usada tanto pelo servidor local quanto pela funcao na nuvem."""
+
+    def setUp(self) -> None:
+        self.diretorio = TemporaryDirectory()
+        self.servico = ServicoDeDna(
+            Path(self.diretorio.name), ClienteFalso(), gravar_resultado=False
+        )
+
+    def tearDown(self) -> None:
+        self.diretorio.cleanup()
+
+    def test_sucesso(self) -> None:
+        situacao, corpo, origem = responder(self.servico, "rafaelacorrea")
+        self.assertEqual(situacao, 200)
+        self.assertEqual(origem, "github")
+        self.assertEqual(corpo["usuario"], "rafaelacorrea")
+
+    def test_nome_vazio(self) -> None:
+        situacao, corpo, _ = responder(self.servico, "   ")
+        self.assertEqual(situacao, 400)
+        self.assertIn("nao e um nome de usuario valido", corpo["erro"])
+
+    def test_falha_do_github_vira_codigo(self) -> None:
+        servico = ServicoDeDna(
+            Path(self.diretorio.name),
+            ClienteFalso(UsuarioNaoEncontrado("nao encontrado no GitHub")),
+            gravar_resultado=False,
+        )
+        situacao, corpo, _ = responder(servico, "fantasma")
+        self.assertEqual(situacao, 404)
+        self.assertIn("nao encontrado", corpo["erro"])
 
 
 if __name__ == "__main__":
