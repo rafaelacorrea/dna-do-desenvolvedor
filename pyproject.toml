@@ -1,0 +1,15 @@
+# Metadados minimos do projeto.
+#
+# A secao [tool.vercel] existe por exigencia da hospedagem: o runtime Python
+# precisa saber qual objeto atende as requisicoes. Todo o resto do projeto
+# continua sem build e sem dependencia externa.
+
+[project]
+name = "dna-do-desenvolvedor"
+version = "1.0.0"
+description = "O perfil publico do GitHub transformado em uma helice 3D procedural"
+requires-python = ">=3.10"
+dependencies = []
+
+[tool.vercel]
+entrypoint = "api.dna:handler"

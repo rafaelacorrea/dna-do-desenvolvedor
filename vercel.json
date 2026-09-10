@@ -7,7 +7,9 @@
     }
   },
   "rewrites": [
-    { "source": "/api/dna/:usuario", "destination": "/api/dna?usuario=:usuario" },
-    { "source": "/api/indice", "destination": "/dados/index.json" }
+    {
+      "source": "/api/dna/:usuario",
+      "destination": "/api/dna?usuario=:usuario"
+    }
   ]
 }

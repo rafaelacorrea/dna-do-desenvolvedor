@@ -41,15 +41,43 @@ SERVICO = ServicoDeDna(
 VERDADEIROS = {"1", "true", "sim"}
 
 
+def _caminho_do_indice() -> Path:
+    """Arquivo do indice versionado no repositorio."""
+    return RAIZ / "web" / "dados" / "index.json"
+
+
+def resolver(caminho: str, consulta: dict) -> tuple:
+    """Escolhe a resposta a partir do caminho pedido.
+
+    A funcao e o unico ponto de entrada Python da hospedagem, entao ela
+    precisa dar conta de tudo que for roteado para ela - inclusive de um
+    caminho que nao existe, que vira 404 em JSON em vez de erro cru.
+    """
+    if caminho.rstrip("/").endswith("/api/indice"):
+        try:
+            indice = json.loads(_caminho_do_indice().read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            indice = []
+        return 200, indice, ""
+
+    if "/api/dna" in caminho:
+        usuario = (consulta.get("usuario") or [""])[0]
+        if not usuario:
+            # Sem rewrite, o nome ainda pode vir no proprio caminho.
+            final = caminho.rstrip("/").rsplit("/", 1)[-1]
+            usuario = "" if final in ("dna", "api") else final
+        forcar = (consulta.get("forcar") or [""])[0].lower() in VERDADEIROS
+        return responder(SERVICO, usuario, forcar)
+
+    return 404, {"erro": "rota desconhecida"}, ""
+
+
 class handler(BaseHTTPRequestHandler):  # noqa: N801 (nome exigido pela hospedagem)
-    """Responde `GET /api/dna?usuario=<nome>`."""
+    """Responde `GET /api/dna?usuario=<nome>` e `GET /api/indice`."""
 
     def do_GET(self) -> None:  # noqa: N802 (nome exigido pela classe base)
-        consulta = parse_qs(urlparse(self.path).query)
-        usuario = (consulta.get("usuario") or [""])[0]
-        forcar = (consulta.get("forcar") or [""])[0].lower() in VERDADEIROS
-
-        situacao, corpo, origem = responder(SERVICO, usuario, forcar)
+        endereco = urlparse(self.path)
+        situacao, corpo, origem = resolver(endereco.path, parse_qs(endereco.query))
         bruto = json.dumps(corpo, ensure_ascii=False).encode("utf-8")
 
         self.send_response(int(situacao))

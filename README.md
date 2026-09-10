@@ -333,6 +333,7 @@ mantem o algoritmo em um lugar so.
 ```
 dna-do-desenvolvedor/
   vercel.json                Configuracao da hospedagem
+  pyproject.toml             Metadados e o entrypoint da hospedagem
   api/
     dna.py                   A mesma API, no formato de funcao sem estado
   .github/workflows/
@@ -362,6 +363,7 @@ dna-do-desenvolvedor/
     test_linguagens.py       Testes da classificacao e das cores
     test_github.py           Testes do cliente, com a API simulada
     test_api.py              Testes das rotas, com o servidor no ar
+    test_funcao.py           Testes do roteamento da funcao na nuvem
     test_cli.py              Testes da linha de comando
   docs/
     demonstracao.gif         Demonstracao usada no README
@@ -424,8 +426,16 @@ vercel.json
   functions: api/dna.py       a coleta, rodando em Python
   rewrites:
     /api/dna/:usuario   ->  /api/dna?usuario=:usuario
-    /api/indice         ->  /dados/index.json
+
+pyproject.toml
+  [tool.vercel] entrypoint    qual objeto atende as requisicoes
 ```
+
+O runtime Python da hospedagem trabalha com um entrypoint unico, e nao com um
+arquivo por rota. Por isso a funcao decide sozinha o que fazer a partir do
+caminho recebido: `/api/dna` coleta, `/api/indice` devolve a colecao
+commitada, qualquer outro vira 404 em JSON. Ela tambem aceita o nome do
+usuario no proprio caminho, para o caso de o rewrite nao ser aplicado.
 
 O `api/dna.py` e uma casca fina: ele monta o `ServicoDeDna` e chama o mesmo
 `dna.api.responder` que o servidor local usa. As regras continuam existindo
@@ -485,10 +495,11 @@ as respostas HTTP sao simuladas com `unittest.mock`.
 python -m unittest discover -s testes -t .
 ```
 
-Sao 82 testes cobrindo as normalizacoes, cada um dos seis tracos, a
+Sao 90 testes cobrindo as normalizacoes, cada um dos seis tracos, a
 estabilidade da semente, a classificacao e as cores das linguagens, a paginacao
 do cliente, todos os caminhos de erro da API do GitHub, a montagem do indice, a
-linha de comando, as rotas HTTP e o modo somente leitura usado na nuvem.
+linha de comando, as rotas HTTP, o roteamento da funcao
+na nuvem e o modo somente leitura.
 
 Os testes da API sobem o servidor de verdade em uma porta livre e conversam com
 ele por `urllib`, com o cliente do GitHub simulado. O que esta sendo verificado
