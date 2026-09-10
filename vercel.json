@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "outputDirectory": "web",
+  "functions": {
+    "api/dna.py": {
+      "includeFiles": "dna/**"
+    }
+  },
+  "rewrites": [
+    { "source": "/api/dna/:usuario", "destination": "/api/dna?usuario=:usuario" },
+    { "source": "/api/indice", "destination": "/dados/index.json" }
+  ]
+}
