@@ -1,0 +1,52 @@
+{
+  "usuario": "gvanrossum",
+  "nome": "Guido van Rossum",
+  "avatar": "https://avatars.githubusercontent.com/u/2894642?v=4",
+  "gerado_em": "2026-09-10T00:26:07+00:00",
+  "semente": 1293052522,
+  "tracos": {
+    "backend": 77,
+    "frontend": 23,
+    "open_source": 98,
+    "atividade": 82,
+    "consistencia": 45,
+    "experimental": 63
+  },
+  "rotulos": {
+    "backend": "Backend",
+    "frontend": "Frontend",
+    "open_source": "Open Source",
+    "atividade": "Atividade",
+    "consistencia": "Consistencia",
+    "experimental": "Experimental"
+  },
+  "linguagens": [
+    {
+      "nome": "Python",
+      "percentual": 58.1,
+      "grupo": "backend",
+      "cor": "#4b8bbe"
+    },
+    {
+      "nome": "HTML",
+      "percentual": 23.1,
+      "grupo": "frontend",
+      "cor": "#e34c26"
+    },
+    {
+      "nome": "C",
+      "percentual": 18.8,
+      "grupo": "backend",
+      "cor": "#808080"
+    }
+  ],
+  "estatisticas": {
+    "repositorios_publicos": 28,
+    "repositorios_proprios": 12,
+    "forks": 16,
+    "estrelas_recebidas": 1654,
+    "seguidores": 26955,
+    "eventos_analisados": 94,
+    "dias_ativos": 18
+  }
+}

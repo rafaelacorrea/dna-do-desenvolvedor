@@ -1,0 +1,64 @@
+{
+  "usuario": "josevalim",
+  "nome": "José Valim",
+  "avatar": "https://avatars.githubusercontent.com/u/9582?v=4",
+  "gerado_em": "2026-09-10T00:26:11+00:00",
+  "semente": 128820647,
+  "tracos": {
+    "backend": 96,
+    "frontend": 4,
+    "open_source": 97,
+    "atividade": 86,
+    "consistencia": 2,
+    "experimental": 51
+  },
+  "rotulos": {
+    "backend": "Backend",
+    "frontend": "Frontend",
+    "open_source": "Open Source",
+    "atividade": "Atividade",
+    "consistencia": "Consistencia",
+    "experimental": "Experimental"
+  },
+  "linguagens": [
+    {
+      "nome": "Elixir",
+      "percentual": 77.8,
+      "grupo": "backend",
+      "cor": "#8c5ea1"
+    },
+    {
+      "nome": "Gleam",
+      "percentual": 6.6,
+      "grupo": "outros",
+      "cor": "#69b7d3"
+    },
+    {
+      "nome": "Lean",
+      "percentual": 6.2,
+      "grupo": "outros",
+      "cor": "#d369ac"
+    },
+    {
+      "nome": "Ruby",
+      "percentual": 5.7,
+      "grupo": "backend",
+      "cor": "#d7282a"
+    },
+    {
+      "nome": "HTML",
+      "percentual": 3.7,
+      "grupo": "frontend",
+      "cor": "#e34c26"
+    }
+  ],
+  "estatisticas": {
+    "repositorios_publicos": 32,
+    "repositorios_proprios": 21,
+    "forks": 11,
+    "estrelas_recebidas": 1335,
+    "seguidores": 16244,
+    "eventos_analisados": 100,
+    "dias_ativos": 7
+  }
+}

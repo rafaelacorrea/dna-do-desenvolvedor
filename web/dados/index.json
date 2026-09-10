@@ -1,0 +1,77 @@
+[
+  {
+    "usuario": "josevalim",
+    "nome": "José Valim",
+    "semente": 128820647,
+    "tracos": {
+      "backend": 96,
+      "frontend": 4,
+      "open_source": 97,
+      "atividade": 86,
+      "consistencia": 2,
+      "experimental": 51
+    },
+    "cor": "#8c5ea1",
+    "gerado_em": "2026-09-10T00:26:11+00:00"
+  },
+  {
+    "usuario": "gvanrossum",
+    "nome": "Guido van Rossum",
+    "semente": 1293052522,
+    "tracos": {
+      "backend": 77,
+      "frontend": 23,
+      "open_source": 98,
+      "atividade": 82,
+      "consistencia": 45,
+      "experimental": 63
+    },
+    "cor": "#4b8bbe",
+    "gerado_em": "2026-09-10T00:26:07+00:00"
+  },
+  {
+    "usuario": "rafaelacorrea",
+    "nome": "Rafaela Correa",
+    "semente": 2530147054,
+    "tracos": {
+      "backend": 44,
+      "frontend": 56,
+      "open_source": 39,
+      "atividade": 76,
+      "consistencia": 76,
+      "experimental": 64
+    },
+    "cor": "#8c5ea1",
+    "gerado_em": "2026-09-10T00:22:42+00:00"
+  },
+  {
+    "usuario": "franknfjr",
+    "nome": "Frank Ferreira",
+    "semente": 4146515582,
+    "tracos": {
+      "backend": 66,
+      "frontend": 34,
+      "open_source": 40,
+      "atividade": 49,
+      "consistencia": 40,
+      "experimental": 56
+    },
+    "cor": "#8c5ea1",
+    "gerado_em": "2026-09-10T00:08:41+00:00"
+  },
+  {
+    "usuario": "torvalds",
+    "nome": "Linus Torvalds",
+    "semente": 1828813506,
+    "tracos": {
+      "backend": 100,
+      "frontend": 0,
+      "open_source": 80,
+      "atividade": 80,
+      "consistencia": 82,
+      "experimental": 52
+    },
+    "cor": "#808080",
+    "gerado_em": "2026-09-10T00:08:39+00:00"
+  }
+]

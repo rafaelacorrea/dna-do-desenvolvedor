@@ -2,11 +2,11 @@
   "usuario": "rafaelacorrea",
   "nome": "Rafaela Correa",
   "avatar": "https://avatars.githubusercontent.com/u/35432817?v=4",
-  "gerado_em": "2026-09-10T00:08:36+00:00",
+  "gerado_em": "2026-09-10T00:22:42+00:00",
   "semente": 2530147054,
   "tracos": {
-    "backend": 42,
-    "frontend": 58,
+    "backend": 44,
+    "frontend": 56,
     "open_source": 39,
     "atividade": 76,
     "consistencia": 76,
@@ -23,37 +23,37 @@
   "linguagens": [
     {
       "nome": "Elixir",
-      "percentual": 25.8,
+      "percentual": 24.9,
       "grupo": "backend",
       "cor": "#8c5ea1"
     },
     {
       "nome": "HTML",
-      "percentual": 17.5,
+      "percentual": 16.9,
       "grupo": "frontend",
       "cor": "#e34c26"
     },
     {
       "nome": "CSS",
-      "percentual": 15.5,
+      "percentual": 15.0,
       "grupo": "frontend",
       "cor": "#7754ab"
     },
     {
-      "nome": "JavaScript",
-      "percentual": 14.0,
-      "grupo": "frontend",
-      "cor": "#f1e05a"
-    },
-    {
       "nome": "Python",
-      "percentual": 11.6,
+      "percentual": 14.4,
       "grupo": "backend",
       "cor": "#4b8bbe"
     },
     {
+      "nome": "JavaScript",
+      "percentual": 13.6,
+      "grupo": "frontend",
+      "cor": "#f1e05a"
+    },
+    {
       "nome": "TypeScript",
-      "percentual": 11.0,
+      "percentual": 10.7,
       "grupo": "frontend",
       "cor": "#337ccc"
     }
