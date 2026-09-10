@@ -2,7 +2,7 @@
   "usuario": "torvalds",
   "nome": "Linus Torvalds",
   "avatar": "https://avatars.githubusercontent.com/u/1024025?v=4",
-  "gerado_em": "2026-09-10T00:08:39+00:00",
+  "gerado_em": "2026-09-10T02:28:44+00:00",
   "semente": 1828813506,
   "tracos": {
     "backend": 100,
@@ -38,8 +38,8 @@
     "repositorios_publicos": 12,
     "repositorios_proprios": 9,
     "forks": 3,
-    "estrelas_recebidas": 259492,
-    "seguidores": 321666,
+    "estrelas_recebidas": 259500,
+    "seguidores": 321678,
     "eventos_analisados": 100,
     "dias_ativos": 28
   }

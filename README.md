@@ -95,8 +95,8 @@ mesmo em qualquer maquina.
 
 ![Trocando de perfil pela galeria](docs/galeria.gif)
 
-Cada vez que voce roda o CLI, o perfil e gravado em `web/dados/<usuario>.json` e
-entra num indice, o `web/dados/index.json`. A cena le esse indice e monta uma
+Cada vez que voce roda o CLI, o perfil e gravado em `public/dados/<usuario>.json` e
+entra num indice, o `public/dados/index.json`. A cena le esse indice e monta uma
 versao reduzida da helice de cada perfil ja conhecido - so as duas fitas, sem
 degraus e sem particulas - alinhadas em um plano atras do DNA em foco.
 
@@ -185,7 +185,7 @@ Opcoes:
 
 | Opcao        | O que faz                                                       |
 | ------------ | --------------------------------------------------------------- |
-| `--saida`    | Grava o JSON em outro caminho (padrao: `web/dados/<usuario>.json`) |
+| `--saida`    | Grava o JSON em outro caminho (padrao: `public/dados/<usuario>.json`) |
 | `--so-texto` | Apenas mostra o resultado no terminal, sem gravar arquivo        |
 | `--token`    | Token do GitHub para aumentar o limite de requisicoes           |
 
@@ -207,7 +207,7 @@ Se voce so quer olhar o que ja foi gerado, qualquer servidor de arquivos
 resolve (os modulos JavaScript nao carregam a partir de `file://`):
 
 ```bash
-python -m http.server --directory web 8000
+python -m http.server --directory public 8000
 ```
 
 Nesse modo o campo de busca so encontra quem ja tem arquivo: sem API, nao ha
@@ -226,7 +226,7 @@ arquivos estaticos.
 - as estruturas **no plano de tras** sao os DNAs ja gerados: passe o mouse para
   acender e clique para trazer aquele perfil ao centro.
 
-Ja vem com cinco perfis prontos em `web/dados`: `rafaelacorrea`, `franknfjr`,
+Ja vem com cinco perfis prontos em `public/dados`: `rafaelacorrea`, `franknfjr`,
 `gvanrossum`, `josevalim` e `torvalds` (util para ver um extremo: 100% backend
 e 80% open source). Eles aparecem no plano de tras assim que a cena abre.
 
@@ -347,7 +347,7 @@ dna-do-desenvolvedor/
     linguagens.py            Classificacao e cores das linguagens
     tracos.py                O algoritmo: perfil -> seis tracos
     cli.py                   Argumentos, resumo em texto e gravacao do JSON
-  web/
+  public/
     index.html               Pagina da cena
     estilo.css               Interface sobreposta
     js/
@@ -384,7 +384,7 @@ dna-do-desenvolvedor/
                 dna/tracos.py -> dna/linguagens.py
                      |
                      v
-            web/dados/<usuario>.json + index.json
+            public/dados/<usuario>.json + index.json
                      |
                      v
     web/js/principal.js -> helice.js -> aleatorio.js
@@ -422,7 +422,7 @@ cada push, so para marcar no GitHub quando algo quebra.
 
 ```
 vercel.json
-  outputDirectory: web        a cena, servida como arquivo estatico
+  pasta public/              a cena, servida como arquivo estatico
   functions: api/dna.py       a coleta, rodando em Python
   rewrites:
     /api/dna/:usuario   ->  /api/dna?usuario=:usuario
@@ -446,7 +446,7 @@ uma vez so.
 **Nao grava nada.** O disco de uma funcao sem estado e somente leitura, entao
 o servico roda com `gravar_resultado=False`: o resultado fica no cache em
 memoria, que dura enquanto a instancia estiver quente, e os perfis
-versionados em `web/dados` seguem sendo lidos normalmente. Na pratica, a
+versionados em `public/dados` seguem sendo lidos normalmente. Na pratica, a
 galeria de fundo e a colecao commitada, e qualquer usuario digitado e
 calculado na hora.
 
@@ -483,7 +483,7 @@ Plausible.
 python servidor.py
 ```
 
-Ai sim tudo e gravado: cada perfil coletado vira arquivo em `web/dados` e
+Ai sim tudo e gravado: cada perfil coletado vira arquivo em `public/dados` e
 entra no indice. E assim que a colecao commitada cresce.
 
 ## Testes

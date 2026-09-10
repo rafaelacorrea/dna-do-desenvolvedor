@@ -37,7 +37,9 @@ from dna.github import ClienteGitHub, ErroDeApi, LimiteExcedido, UsuarioNaoEncon
 # de dados na hora de montar o caminho do arquivo.
 NOME_VALIDO = re.compile(r"^[A-Za-z0-9](?:[A-Za-z0-9]|-(?=[A-Za-z0-9])){0,38}$")
 
-PASTA_WEB = Path("web")
+# A pasta se chama `public` por convencao da hospedagem: e o nome que ela
+# serve na raiz do dominio sem precisar de configuracao.
+PASTA_WEB = Path("public")
 PASTA_DADOS = PASTA_WEB / "dados"
 
 

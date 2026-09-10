@@ -9,7 +9,7 @@ Duas diferencas em relacao ao servidor local:
 
 - **Nao grava nada.** O disco da funcao e somente leitura, entao o resultado
   fica so no cache em memoria, que sobrevive enquanto a instancia estiver
-  quente. Os perfis versionados em `web/dados` continuam sendo lidos.
+  quente. Os perfis versionados em `public/dados` continuam sendo lidos.
 - **O token vem do ambiente.** `GITHUB_TOKEN` configurado na hospedagem leva o
   limite de 60 para 5000 requisicoes por hora, sem nunca aparecer na pagina.
 """
@@ -33,7 +33,7 @@ from dna.github import ClienteGitHub  # noqa: E402
 # Criado no escopo do modulo de proposito: instancias reaproveitadas entre
 # requisicoes mantem o cache em memoria, o que evita repetir coleta.
 SERVICO = ServicoDeDna(
-    RAIZ / "web" / "dados",
+    RAIZ / "public" / "dados",
     ClienteGitHub(token=os.environ.get("GITHUB_TOKEN")),
     gravar_resultado=False,
 )
@@ -43,7 +43,7 @@ VERDADEIROS = {"1", "true", "sim"}
 
 def _caminho_do_indice() -> Path:
     """Arquivo do indice versionado no repositorio."""
-    return RAIZ / "web" / "dados" / "index.json"
+    return RAIZ / "public" / "dados" / "index.json"
 
 
 def resolver(caminho: str, consulta: dict) -> tuple:

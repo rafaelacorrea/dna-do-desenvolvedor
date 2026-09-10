@@ -27,12 +27,12 @@ DESCRICAO = (
 EXEMPLOS = """\
 Exemplos de uso:
   python dna_cli.py rafaelacorrea
-  python dna_cli.py rafaelacorrea --saida web/dados/rafaelacorrea.json
+  python dna_cli.py rafaelacorrea --saida public/dados/rafaelacorrea.json
   python dna_cli.py rafaelacorrea --so-texto
 """
 
 VARIAVEL_DE_TOKEN = "GITHUB_TOKEN"
-PASTA_PADRAO = Path("web") / "dados"
+PASTA_PADRAO = Path("public") / "dados"
 ARQUIVO_DE_INDICE = "index.json"
 LARGURA_DA_BARRA = 24
 
@@ -214,6 +214,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     colecao = "1 perfil" if total == 1 else f"{total} perfis"
     print(f"\nArquivo gravado em {destino}")
     print(f"Indice atualizado em {indice} ({colecao} na colecao)")
-    print("Abra a cena com: python -m http.server --directory web 8000")
+    print("Abra a cena com: python -m http.server --directory public 8000")
     print(f"e acesse: http://localhost:8000/?usuario={usuario}")
     return 0
