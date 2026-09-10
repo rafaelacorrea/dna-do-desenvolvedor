@@ -9,10 +9,11 @@ Duas pessoas nunca geram a mesma helice. A mesma pessoa gera sempre a mesma.
 E cada perfil gerado fica guardado: os anteriores ficam flutuando em um plano
 atras do que esta em foco, e um clique traz qualquer um deles para o centro.
 
-Um coletor em Python (evolucao do projeto
-[github-user-activity](https://github.com/rafaelacorrea/github-user-activity))
-busca os dados e grava um JSON; uma cena em Three.js le esse JSON e monta a
-estrutura.
+Todo o calculo e Python (evolucao do projeto
+[github-user-activity](https://github.com/rafaelacorrea/github-user-activity)),
+servido por uma API que a cena em Three.js consome. Digitou um usuario na tela,
+o Python coleta no GitHub, calcula os tracos e devolve o JSON que vira a
+helice - sem duplicar uma linha do algoritmo em JavaScript.
 
 ## Sumario
 
@@ -22,6 +23,7 @@ estrutura.
 - [A colecao de DNAs](#a-colecao-de-dnas)
 - [Requisitos](#requisitos)
 - [Como usar](#como-usar)
+- [A API](#a-api)
 - [O algoritmo](#o-algoritmo)
 - [Formato do JSON](#formato-do-json)
 - [Estrutura do projeto](#estrutura-do-projeto)
@@ -125,9 +127,36 @@ quadros. Reduzida, cada uma tem duas.
 
 ## Como usar
 
-Sao dois passos: gerar o JSON e abrir a cena.
+```bash
+python servidor.py
+```
 
-### 1. Gerar o DNA
+```
+Cena em http://127.0.0.1:8000
+API  em http://127.0.0.1:8000/api/dna/<usuario>
+Sem token: cerca de 60 requisicoes por hora na API do GitHub.
+Ctrl+C para encerrar.
+```
+
+Abra o endereco, digite qualquer usuario do GitHub no campo de baixo e pronto:
+a API coleta, calcula e a helice aparece. Perfis ja coletados voltam na hora,
+direto do arquivo, sem gastar requisicao.
+
+Opcoes do servidor:
+
+| Opcao        | O que faz                                                        |
+| ------------ | ---------------------------------------------------------------- |
+| `--porta`    | Porta de escuta (padrao: 8000)                                   |
+| `--endereco` | Use `0.0.0.0` para aceitar acesso da rede local                  |
+| `--token`    | Token do GitHub, para sair do limite de 60 requisicoes por hora  |
+
+### Pelo terminal, sem abrir o navegador
+
+O mesmo calculo tambem roda direto na linha de comando. E o jeito de
+pre-gerar os perfis que vao commitados no repositorio, para a cena nao abrir
+vazia em uma publicacao estatica.
+
+#### Gerar o DNA
 
 ```bash
 python dna_cli.py rafaelacorrea
@@ -172,19 +201,21 @@ $env:GITHUB_TOKEN = "ghp_seu_token_aqui"
 python dna_cli.py rafaelacorrea
 ```
 
-### 2. Abrir a cena
+#### Servir a cena sem a API
 
-A cena precisa ser servida por HTTP (os modulos JavaScript nao carregam a
-partir de `file://`):
+Se voce so quer olhar o que ja foi gerado, qualquer servidor de arquivos
+resolve (os modulos JavaScript nao carregam a partir de `file://`):
 
 ```bash
 python -m http.server --directory web 8000
 ```
 
-Depois abra `http://localhost:8000/?usuario=rafaelacorrea`.
+Nesse modo o campo de busca so encontra quem ja tem arquivo: sem API, nao ha
+como coletar.
 
-Na tela:
+### Na tela
 
+- **digitar um usuario** e apertar gerar coleta o perfil na hora;
 - **arrastar** gira a estrutura;
 - **rolar** aproxima e afasta;
 - o campo **usuario** troca de perfil, contanto que o JSON dele ja tenha sido
@@ -197,6 +228,35 @@ Na tela:
 Ja vem com cinco perfis prontos em `web/dados`: `rafaelacorrea`, `franknfjr`,
 `gvanrossum`, `josevalim` e `torvalds` (util para ver um extremo: 100% backend
 e 80% open source). Eles aparecem no plano de tras assim que a cena abre.
+
+## A API
+
+O `servidor.py` serve a cena e as rotas abaixo no mesmo endereco, usando so o
+`http.server` da biblioteca padrao:
+
+| Rota                             | O que devolve                                   |
+| -------------------------------- | ----------------------------------------------- |
+| `GET /api/dna/<usuario>`         | O DNA do usuario, do arquivo ou coletado na hora |
+| `GET /api/dna/<usuario>?forcar=1`| Ignora o arquivo e coleta de novo                |
+| `GET /api/indice`                | A lista dos DNAs ja gerados                      |
+
+O cabecalho `X-Dna-Origem` diz de onde veio a resposta: `arquivo` quando o
+perfil ja estava gravado, `github` quando foi coletado agora. Toda resposta da
+API leva `X-Dna-Api: 1` - e assim que a cena distingue "esse usuario nao existe"
+de "nao ha API neste endereco" e decide se cai nos arquivos estaticos.
+
+Os erros chegam como JSON com uma mensagem em portugues e o codigo certo:
+`404` para usuario inexistente, `429` para limite da API do GitHub atingido,
+`502` quando o GitHub esta fora, `400` para nome de usuario invalido.
+
+Dois cuidados que valem nota:
+
+- **Nome validado antes de virar caminho.** O nome de usuario e conferido
+  contra a regra do proprio GitHub. Alem de recusar entrada invalida cedo,
+  isso impede que um `../..` escape da pasta de dados.
+- **Um cadeado por usuario.** Se duas abas pedirem o mesmo perfil ao mesmo
+  tempo, a segunda espera a primeira terminar e aproveita o arquivo recem
+  gravado, em vez de gastar outra chamada na API do GitHub.
 
 ## O algoritmo
 
@@ -271,9 +331,11 @@ mantem o algoritmo em um lugar so.
 
 ```
 dna-do-desenvolvedor/
+  servidor.py                Executavel: sobe a cena e a API juntas
   dna_cli.py                 Executavel: chama dna.cli.main
   dna/
     __init__.py              Exporta os componentes publicos do pacote
+    api.py                   Servidor HTTP: rotas da API e arquivos da cena
     github.py                Chamadas a API publica do GitHub
     linguagens.py            Classificacao e cores das linguagens
     tracos.py                O algoritmo: perfil -> seis tracos
@@ -293,6 +355,7 @@ dna-do-desenvolvedor/
     test_tracos.py           Testes do algoritmo
     test_linguagens.py       Testes da classificacao e das cores
     test_github.py           Testes do cliente, com a API simulada
+    test_api.py              Testes das rotas, com o servidor no ar
     test_cli.py              Testes da linha de comando
   docs/
     demonstracao.gif         Demonstracao usada no README
@@ -304,27 +367,32 @@ dna-do-desenvolvedor/
 ## Arquitetura
 
 ```
-dna_cli.py -> dna/cli.py -> dna/github.py -> api.github.com
-                   |
-              dna/tracos.py -> dna/linguagens.py
-                   |
-                   v
-          web/dados/<usuario>.json
-                   |
-                   v
-          web/dados/index.json
-                   |
-                   v
-  web/js/principal.js -> helice.js -> aleatorio.js
-                      -> galeria.js
-                      -> eixos.js
-                      -> painel.js
+                        api.github.com
+                              ^
+                              |
+  servidor.py -> dna/api.py -> dna/github.py
+  dna_cli.py  -> dna/cli.py ->
+                     |
+                dna/tracos.py -> dna/linguagens.py
+                     |
+                     v
+            web/dados/<usuario>.json + index.json
+                     |
+                     v
+    web/js/principal.js -> helice.js -> aleatorio.js
+                        -> galeria.js
+                        -> eixos.js
+                        -> painel.js
 ```
 
 O ponto importante e a fronteira do JSON. Tudo que e decisao (o que conta como
 backend, quanto vale uma estrela, o que e ser consistente) fica em Python, com
 testes. Tudo que e desenho fica em JavaScript. A cena nunca chama a API do
-GitHub e nunca recalcula um traco.
+GitHub e nunca recalcula um traco - ela pede pronto.
+
+A linha de comando e a API sao duas portas para o mesmo miolo: as duas chamam
+`dna.tracos.calcular` e gravam com `dna.cli.gravar`. Trocar uma formula muda o
+comportamento das duas de uma vez.
 
 `dna/github.py` nasceu do cliente escrito no projeto `github-user-activity`.
 Ele ganhou aqui a busca de perfil e a de repositorios com paginacao, mas manteve
@@ -332,6 +400,14 @@ a mesma estrutura: so `urllib`, e cada falha HTTP virando uma excecao com
 mensagem em portugues.
 
 ## Publicando no GitHub Pages
+
+O Pages serve arquivos, nao roda Python. Publicado la, o site funciona com os
+perfis que ja estao commitados, e o campo de busca so encontra quem tem
+arquivo - sem API, nao ha como coletar um usuario novo. A cena percebe isso
+sozinha e cai nos arquivos estaticos.
+
+Para ter a coleta ao vivo no ar, o `servidor.py` precisa estar rodando em algum
+lugar (uma maquina sua, um container, uma hospedagem que aceite Python).
 
 A pasta `web` e um site estatico comum. Com o Pages ligado na raiz da branch
 `main`, a cena fica em:
@@ -361,16 +437,25 @@ as respostas HTTP sao simuladas com `unittest.mock`.
 python -m unittest discover -s testes -t .
 ```
 
-Sao 60 testes cobrindo as normalizacoes, cada um dos seis tracos, a
+Sao 74 testes cobrindo as normalizacoes, cada um dos seis tracos, a
 estabilidade da semente, a classificacao e as cores das linguagens, a paginacao
-do cliente, todos os caminhos de erro da API, a montagem do indice e a linha de
-comando.
+do cliente, todos os caminhos de erro da API do GitHub, a montagem do indice, a
+linha de comando e as rotas HTTP.
+
+Os testes da API sobem o servidor de verdade em uma porta livre e conversam com
+ele por `urllib`, com o cliente do GitHub simulado. O que esta sendo verificado
+e o comportamento real das rotas: codigos de situacao, cabecalhos e o que fica
+gravado em disco.
 
 ## Decisoes de implementacao
 
-- **O algoritmo mora em um lugar so.** Seria facil recalcular tudo em
-  JavaScript e deixar a pagina buscar a API sozinha, mas ai existiriam duas
-  versoes da mesma regra para manter em sincronia. O JSON e a fronteira.
+- **O algoritmo mora em um lugar so.** A pagina poderia chamar a API do
+  GitHub direto do navegador, mas ai a formula existiria duas vezes, em Python
+  e em JavaScript, e qualquer ajuste teria que ser feito nos dois lugares. Uma
+  API em Python resolve o mesmo problema mantendo uma implementacao so.
+- **A API usa `http.server`.** Um Flask ou FastAPI daria mais conforto, mas
+  traria a primeira dependencia externa do projeto para servir tres rotas de
+  leitura. A biblioteca padrao da conta.
 - **Semente derivada do nome.** Uma estrutura procedural que muda a cada
   recarga seria bonita e inutil: nao daria para reconhecer o proprio DNA. O
   hash do nome de usuario garante o oposto.
