@@ -78,14 +78,16 @@ class TesteIndiceDaFuncao(unittest.TestCase):
         self.assertIsInstance(corpo, list)
         self.assertTrue(all("usuario" in entrada for entrada in corpo))
 
-    def test_indice_ausente_devolve_lista_vazia(self) -> None:
+    def test_indice_ausente_devolve_404(self) -> None:
+        # A cena trata o 404 caindo no arquivo estatico; uma lista vazia
+        # apagaria a galeria sem que ninguem percebesse o motivo.
         with TemporaryDirectory() as pasta:
             inexistente = Path(pasta) / "nao-existe.json"
             with patch.object(funcao, "_caminho_do_indice", lambda: inexistente):
                 situacao, corpo, _ = funcao.resolver("/api/indice", {})
 
-        self.assertEqual(int(situacao), 200)
-        self.assertEqual(corpo, [])
+        self.assertEqual(int(situacao), 404)
+        self.assertIn("indisponivel", corpo["erro"])
 
 
 if __name__ == "__main__":

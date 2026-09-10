@@ -57,7 +57,10 @@ def resolver(caminho: str, consulta: dict) -> tuple:
         try:
             indice = json.loads(_caminho_do_indice().read_text(encoding="utf-8"))
         except (OSError, json.JSONDecodeError):
-            indice = []
+            # Devolver lista vazia seria mentir: a cena acharia que a colecao
+            # esta vazia e nao desenharia a galeria. Com 404 ela cai no
+            # arquivo estatico, que a hospedagem serve de qualquer forma.
+            return 404, {"erro": "indice indisponivel"}, ""
         return 200, indice, ""
 
     if "/api/dna" in caminho:
