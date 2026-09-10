@@ -6,6 +6,8 @@ repositorios e a atividade recente da pessoa, calcula seis tracos e usa esses
 tracos para construir uma estrutura procedural unica.
 
 Duas pessoas nunca geram a mesma helice. A mesma pessoa gera sempre a mesma.
+E cada perfil gerado fica guardado: os anteriores ficam flutuando em um plano
+atras do que esta em foco, e um clique traz qualquer um deles para o centro.
 
 Um coletor em Python (evolucao do projeto
 [github-user-activity](https://github.com/rafaelacorrea/github-user-activity))
@@ -17,6 +19,7 @@ estrutura.
 - [Demonstracao](#demonstracao)
 - [A ideia](#a-ideia)
 - [Como o perfil vira geometria](#como-o-perfil-vira-geometria)
+- [A colecao de DNAs](#a-colecao-de-dnas)
 - [Requisitos](#requisitos)
 - [Como usar](#como-usar)
 - [O algoritmo](#o-algoritmo)
@@ -86,6 +89,31 @@ Nada disso e aleatorio de verdade. A semente do gerador vem de um hash do nome
 de usuario, calculado em Python e gravado no JSON, entao o resultado e sempre o
 mesmo em qualquer maquina.
 
+## A colecao de DNAs
+
+![Trocando de perfil pela galeria](docs/galeria.gif)
+
+Cada vez que voce roda o CLI, o perfil e gravado em `web/dados/<usuario>.json` e
+entra num indice, o `web/dados/index.json`. A cena le esse indice e monta uma
+versao reduzida da helice de cada perfil ja conhecido - so as duas fitas, sem
+degraus e sem particulas - alinhadas em um plano atras do DNA em foco.
+
+Passar o mouse acende a estrutura e o nome. Clicar faz a camera voar ate ela,
+troca o perfil em foco e devolve a camera para o enquadramento normal, com o
+antigo indo ocupar o lugar vago la atras. Nada recarrega: e tudo a mesma cena.
+
+O plano acompanha a camera. Como a cena gira sozinha, um plano fixo acabaria
+passando na frente do DNA principal; girando junto, a galeria fica sempre
+atras do que voce esta olhando.
+
+Nao ha banco de dados nisso. A colecao sao os proprios arquivos JSON da pasta,
+e o indice e reconstruido do zero a cada execucao do CLI, varrendo o que esta
+la. Apagou um JSON na mao? Na proxima execucao ele some do indice sozinho.
+
+As miniaturas sao simplificadas por um motivo pratico: uma helice completa
+passa de duzentas malhas, e uma duzia delas na cena derrubaria a taxa de
+quadros. Reduzida, cada uma tem duas.
+
 ## Requisitos
 
 - Python 3.10 ou superior para o coletor.
@@ -121,6 +149,7 @@ Base de calculo: 40 repositorios proprios, 16 forks, 9 estrelas, 34 eventos rece
 Semente da estrutura: 2530147054
 
 Arquivo gravado em web\dados\rafaelacorrea.json
+Indice atualizado em web\dados\index.json (5 perfis na colecao)
 ```
 
 Opcoes:
@@ -161,10 +190,13 @@ Na tela:
 - o campo **usuario** troca de perfil, contanto que o JSON dele ja tenha sido
   gerado;
 - o interruptor **mostrar eixos** revela o diagrama dos tres eixos em 3D, com
-  um marcador na posicao exata do perfil em cada um deles.
+  um marcador na posicao exata do perfil em cada um deles;
+- as estruturas **no plano de tras** sao os DNAs ja gerados: passe o mouse para
+  acender e clique para trazer aquele perfil ao centro.
 
-Ja vem com tres perfis prontos em `web/dados`: `rafaelacorrea`, `franknfjr` e
-`torvalds` (util para ver um extremo: 100% backend e 80% open source).
+Ja vem com cinco perfis prontos em `web/dados`: `rafaelacorrea`, `franknfjr`,
+`gvanrossum`, `josevalim` e `torvalds` (util para ver um extremo: 100% backend
+e 80% open source). Eles aparecem no plano de tras assim que a cena abre.
 
 ## O algoritmo
 
@@ -252,10 +284,11 @@ dna-do-desenvolvedor/
     js/
       principal.js           Montagem da cena, camera, bloom e interface
       helice.js              Construcao procedural da helice
+      galeria.js             Os DNAs ja gerados no plano de fundo
       eixos.js               Diagrama dos tres eixos em 3D
       aleatorio.js           Gerador pseudoaleatorio com semente
       painel.js              Painel de tracos, linguagens e estatisticas
-    dados/                   JSONs gerados pelo CLI
+    dados/                   JSONs gerados pelo CLI, mais o index.json
   testes/
     test_tracos.py           Testes do algoritmo
     test_linguagens.py       Testes da classificacao e das cores
@@ -263,6 +296,7 @@ dna-do-desenvolvedor/
     test_cli.py              Testes da linha de comando
   docs/
     demonstracao.gif         Demonstracao usada no README
+    galeria.gif              A troca de perfil pela galeria
   .gitignore
   README.md
 ```
@@ -278,7 +312,11 @@ dna_cli.py -> dna/cli.py -> dna/github.py -> api.github.com
           web/dados/<usuario>.json
                    |
                    v
+          web/dados/index.json
+                   |
+                   v
   web/js/principal.js -> helice.js -> aleatorio.js
+                      -> galeria.js
                       -> eixos.js
                       -> painel.js
 ```
@@ -307,9 +345,12 @@ disponivel precisa ser gerado e commitado antes:
 
 ```bash
 python dna_cli.py alguem
-git add web/dados/alguem.json
+git add web/dados/alguem.json web/dados/index.json
 git commit -m "feat: adiciona o dna de alguem"
 ```
+
+O `index.json` precisa ir junto: e ele que faz o perfil novo aparecer no plano
+de fundo para quem visita o site.
 
 ## Testes
 
@@ -320,9 +361,10 @@ as respostas HTTP sao simuladas com `unittest.mock`.
 python -m unittest discover -s testes -t .
 ```
 
-Sao 53 testes cobrindo as normalizacoes, cada um dos seis tracos, a
+Sao 60 testes cobrindo as normalizacoes, cada um dos seis tracos, a
 estabilidade da semente, a classificacao e as cores das linguagens, a paginacao
-do cliente, todos os caminhos de erro da API e a linha de comando.
+do cliente, todos os caminhos de erro da API, a montagem do indice e a linha de
+comando.
 
 ## Decisoes de implementacao
 
@@ -338,6 +380,10 @@ do cliente, todos os caminhos de erro da API e a linha de comando.
   medida, entao dividem 100 pontos. Ja consistencia e experimental sao
   independentes: da para ser as duas coisas ao mesmo tempo, e o eixo serve
   apenas como referencia visual.
+- **Sem banco de dados.** A colecao de perfis sao os arquivos JSON, e o
+  indice e derivado deles. Um banco daria um estado a mais para manter em dia
+  sem resolver nenhum problema que a pasta ja nao resolva - e o site e
+  estatico, entao ele nunca poderia ler esse banco de qualquer forma.
 - **Sem emoji e sem framework.** Nem no codigo, nem na interface, nem nos
   commits. A cena e Three.js puro, sem bundler e sem etapa de build.
 
