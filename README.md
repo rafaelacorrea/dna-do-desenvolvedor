@@ -28,7 +28,7 @@ helice - sem duplicar uma linha do algoritmo em JavaScript.
 - [Formato do JSON](#formato-do-json)
 - [Estrutura do projeto](#estrutura-do-projeto)
 - [Arquitetura](#arquitetura)
-- [Publicando no GitHub Pages](#publicando-no-github-pages)
+- [Publicacao](#publicacao)
 - [Testes](#testes)
 - [Decisoes de implementacao](#decisoes-de-implementacao)
 - [Licenca](#licenca)
@@ -211,7 +211,8 @@ python -m http.server --directory web 8000
 ```
 
 Nesse modo o campo de busca so encontra quem ja tem arquivo: sem API, nao ha
-como coletar.
+como coletar. E o que acontece em qualquer hospedagem que sirva apenas
+arquivos estaticos.
 
 ### Na tela
 
@@ -331,8 +332,11 @@ mantem o algoritmo em um lugar so.
 
 ```
 dna-do-desenvolvedor/
+  vercel.json                Configuracao da hospedagem
+  api/
+    dna.py                   A mesma API, no formato de funcao sem estado
   .github/workflows/
-    pages.yml                Testa, atualiza os perfis e publica no Pages
+    testes.yml               Roda a suite a cada push
   servidor.py                Executavel: sobe a cena e a API juntas
   dna_cli.py                 Executavel: chama dna.cli.main
   dna/
@@ -353,7 +357,6 @@ dna-do-desenvolvedor/
       aleatorio.js           Gerador pseudoaleatorio com semente
       painel.js              Painel de tracos, linguagens e estatisticas
     dados/                   JSONs gerados pelo CLI, mais o index.json
-    CNAME                    Dominio usado na publicacao
   testes/
     test_tracos.py           Testes do algoritmo
     test_linguagens.py       Testes da classificacao e das cores
@@ -402,56 +405,76 @@ Ele ganhou aqui a busca de perfil e a de repositorios com paginacao, mas manteve
 a mesma estrutura: so `urllib`, e cada falha HTTP virando uma excecao com
 mensagem em portugues.
 
-## Publicando no GitHub Pages
+## Publicacao
 
-O Pages serve arquivos, nao roda Python. Publicado la, o site funciona com os
-perfis que ja estao na pasta de dados, e o campo de busca so encontra quem tem
-arquivo - sem API, nao ha como coletar um usuario novo. A cena percebe isso
-sozinha e cai nos arquivos estaticos.
+O site esta no ar em **https://dna.rafaelacorrea.dev**, hospedado na Vercel.
+A escolha nao foi por gosto: o GitHub Pages so entrega arquivos, e este
+projeto precisa de Python rodando para coletar um usuario que ninguem gerou
+antes.
 
-A publicacao vai pelo workflow `.github/workflows/pages.yml`, que a cada push
-na `main` (e uma vez por dia, as 6h UTC):
+A hospedagem acompanha o repositorio: cada commit na `main` vira um deploy,
+sem workflow de publicacao. O `.github/workflows/testes.yml` roda a suite a
+cada push, so para marcar no GitHub quando algo quebra.
 
-1. roda a suite de testes;
-2. regera cada perfil da colecao chamando o proprio CLI;
-3. sobe a pasta `web` como artefato e publica.
+### Como esta montado
 
-E ali, e so ali, que existe token: o `GITHUB_TOKEN` automatico do Actions, que
-da 1000 requisicoes por hora na API do GitHub. Nenhum token e criado a mao nem
-fica no repositorio - um token em site estatico seria publico para qualquer
-visitante.
-
-Para ligar: **Settings -> Pages -> Source: GitHub Actions**.
-
-### Dominio proprio
-
-O arquivo `web/CNAME` define o endereco final. Para um subdominio como
-`dna.seudominio.dev`, funcionando ao lado de um Pages que ja usa o dominio
-principal em outro repositorio:
-
-1. `Settings -> Pages -> Custom domain`: `dna.seudominio.dev`;
-2. no DNS, um registro `CNAME` de `dna` apontando para `<usuario>.github.io.`;
-3. marcar **Enforce HTTPS** depois que o certificado sair.
-
-Cada repositorio pode ter o seu proprio dominio: o repo do site principal fica
-com o apex e este fica com o subdominio, sem conflito.
-
-### Coleta ao vivo
-
-Para o campo de busca coletar usuarios novos, o `servidor.py` precisa estar
-rodando em algum lugar que aceite Python (uma maquina sua, um container, uma
-hospedagem com suporte a Python). O Pages sozinho nunca fara isso.
-
-### Acrescentando um perfil a mao
-
-```bash
-python dna_cli.py alguem
-git add web/dados/alguem.json web/dados/index.json
-git commit -m "feat: adiciona o dna de alguem"
+```
+vercel.json
+  outputDirectory: web        a cena, servida como arquivo estatico
+  functions: api/dna.py       a coleta, rodando em Python
+  rewrites:
+    /api/dna/:usuario   ->  /api/dna?usuario=:usuario
+    /api/indice         ->  /dados/index.json
 ```
 
-O `index.json` precisa ir junto: e ele que faz o perfil novo aparecer no plano
-de fundo para quem visita o site.
+O `api/dna.py` e uma casca fina: ele monta o `ServicoDeDna` e chama o mesmo
+`dna.api.responder` que o servidor local usa. As regras continuam existindo
+uma vez so.
+
+### Duas diferencas em relacao ao servidor local
+
+**Nao grava nada.** O disco de uma funcao sem estado e somente leitura, entao
+o servico roda com `gravar_resultado=False`: o resultado fica no cache em
+memoria, que dura enquanto a instancia estiver quente, e os perfis
+versionados em `web/dados` seguem sendo lidos normalmente. Na pratica, a
+galeria de fundo e a colecao commitada, e qualquer usuario digitado e
+calculado na hora.
+
+**O token vem do ambiente.** Em `Settings -> Environment Variables` da
+hospedagem, `GITHUB_TOKEN` com um token de leitura publica. Isso leva o limite
+de 60 para 5000 requisicoes por hora, e o token nunca chega ao navegador -
+quem chama a API do GitHub e o Python, no servidor.
+
+### Dominio
+
+Um registro `CNAME` de `dna` apontando para o endereco que a Vercel indica no
+painel do projeto, e o dominio cadastrado la em `Settings -> Domains`. O
+dominio principal continua onde estiver: subdominio nao conflita com o apex.
+
+### Analytics
+
+A pagina carrega o Plausible do dominio principal com o script manual:
+
+```html
+<script defer data-domain="rafaelacorrea.dev"
+        src="https://plausible.io/js/script.manual.js"></script>
+<script>
+  plausible("pageview", { u: "https://rafaelacorrea.dev/dna" });
+</script>
+```
+
+Assim a visita cai no painel que ja existe, aparecendo como `/dna` em vez de
+mais um `/` misturado com a home. Nenhum site novo precisa ser criado no
+Plausible.
+
+### Rodando na sua maquina
+
+```bash
+python servidor.py
+```
+
+Ai sim tudo e gravado: cada perfil coletado vira arquivo em `web/dados` e
+entra no indice. E assim que a colecao commitada cresce.
 
 ## Testes
 
@@ -462,10 +485,10 @@ as respostas HTTP sao simuladas com `unittest.mock`.
 python -m unittest discover -s testes -t .
 ```
 
-Sao 74 testes cobrindo as normalizacoes, cada um dos seis tracos, a
+Sao 82 testes cobrindo as normalizacoes, cada um dos seis tracos, a
 estabilidade da semente, a classificacao e as cores das linguagens, a paginacao
 do cliente, todos os caminhos de erro da API do GitHub, a montagem do indice, a
-linha de comando e as rotas HTTP.
+linha de comando, as rotas HTTP e o modo somente leitura usado na nuvem.
 
 Os testes da API sobem o servidor de verdade em uma porta livre e conversam com
 ele por `urllib`, com o cliente do GitHub simulado. O que esta sendo verificado
