@@ -104,6 +104,15 @@ def formatar(dna: Dict[str, Any]) -> str:
     return "\n".join(linhas)
 
 
+def caminho_do_usuario(pasta: Path, usuario: str) -> Path:
+    """Devolve o arquivo de um usuario dentro da pasta de dados.
+
+    O nome vai sempre em minusculas: no GitHub "Torvalds" e "torvalds" sao a
+    mesma pessoa, e sem isso a colecao acumularia arquivos repetidos.
+    """
+    return Path(pasta) / f"{usuario.strip().lower()}.json"
+
+
 def gravar(dna: Dict[str, Any], caminho: Path) -> Path:
     """Grava o JSON do DNA, criando as pastas necessarias."""
     caminho.parent.mkdir(parents=True, exist_ok=True)
@@ -184,7 +193,11 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     if argumentos.so_texto:
         return 0
 
-    destino = Path(argumentos.saida) if argumentos.saida else PASTA_PADRAO / f"{usuario}.json"
+    destino = (
+        Path(argumentos.saida)
+        if argumentos.saida
+        else caminho_do_usuario(PASTA_PADRAO, usuario)
+    )
     try:
         gravar(dna, destino)
     except OSError as erro:

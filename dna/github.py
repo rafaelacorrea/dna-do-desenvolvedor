@@ -127,8 +127,9 @@ class ClienteGitHub:
             restantes = erro.headers.get("X-RateLimit-Remaining") if erro.headers else None
             if restantes == "0":
                 return LimiteExcedido(
-                    "limite de requisicoes da API atingido; tente de novo mais tarde "
-                    "ou use um token com a opcao --token"
+                    "limite de requisicoes da API do GitHub atingido; tente de novo "
+                    "mais tarde ou use um token (--token no CLI, ou a variavel de "
+                    "ambiente GITHUB_TOKEN)"
                 )
             return LimiteExcedido("acesso negado pela API do GitHub")
         if erro.code >= 500:
