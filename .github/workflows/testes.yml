@@ -1,0 +1,25 @@
+# Roda a suite a cada push e em cada pull request.
+#
+# A publicacao nao esta aqui: a hospedagem acompanha o repositorio e faz o
+# deploy sozinha a cada commit na main. Este workflow existe para que um
+# commit que quebre alguma coisa apareca marcado no proprio GitHub.
+
+name: Testes
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  testar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Rodar a suite
+        run: python -m unittest discover -s testes -t . -v
